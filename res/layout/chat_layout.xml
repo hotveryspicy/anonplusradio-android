@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+	
+    <RelativeLayout
+        android:id="@+id/channelArea"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" 
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_weight="1" >
+        
+        
+	    <TextView
+	        android:id="@+id/chatNickListTextView"
+	        android:layout_width="100dp"
+	        android:layout_height="fill_parent"
+	        android:layout_alignParentTop="true"
+	        android:layout_marginTop="10dp"
+	        android:layout_alignParentRight="true"
+	        
+	        android:background="#333333"
+	        android:scrollbars="vertical"
+	        android:text="" />
+	    <TextView
+	        android:id="@+id/chatTextView"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:layout_alignParentTop="true"
+	        android:layout_marginTop="10dp"
+	        android:layout_alignParentLeft="true"
+	        android:layout_toLeftOf="@+id/chatNickListTextView"
+	        android:layout_marginRight="5dp"
+	        android:background="@color/chatBackgroundColor"
+	        android:scrollbars="vertical"
+	        android:text="" />
+	    	
+	    
+  
+  </RelativeLayout>
+    
+  <RelativeLayout
+      android:id="@+id/inputArea"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp" 
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="0" >
+	    <!--         android:layout_below="@+id/channelArea" -->
+      
+    <Button
+        android:id="@+id/chatSendButton"
+        android:layout_width="60dp"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/channelArea"
+		android:layout_alignParentRight="true"
+        android:text="send" 
+        />
+      <EditText
+        android:id="@+id/chatInput"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_toLeftOf="@+id/chatSendButton"
+		android:layout_alignParentLeft="true"
+		android:maxLines="1"
+		/>
+
+    </RelativeLayout>
+
+</LinearLayout>

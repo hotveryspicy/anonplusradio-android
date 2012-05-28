@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+<ScrollView
+    android:id="@+id/ScrlView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >    
+
+    <TextView
+        android:id="@+id/aboutText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:text="anonplusradio for android\n
+http://anonplus.com\n
+http://anonplusradio.com\n
+\n     
+developed by developers who wish to remain anonymous\n
+voice yer feature requests in #anonplusradio n we will get wind\n
+grafix by Jordan\n
+\n
+DJ's are welcome! Please go to #anonplusradio if you want a slot\n
+\n
+shouts to:\n
+DarkNetFan, lorax, and the radio crew!!!!\n
+g3t m0n3y cr3w\n
+mon0\n
+r0dtick1er\n
+g00ch\n
+\n
+***RIP ST3VE-0, B4NKSTON, P4UL, W4FFLE, 4NG3L, L1ZZY, AM3L1A B.***\n
+\n
+get ur l34rn on:\n
+http://securitytube.net\n
+http://thehackernews.com\n
+http://geekblog.tv\n
+http://hak5.org\n
+http://ocw.mit.edu\n
+http://redtube.com\n
+http://anonnews.org\n
+http://goatse.ru\n
+http://resources.infosecinstitute.com\n
+http://www.w3schools.com\n
+\n
+Life is Knowledge, Wisdom, and Understanding\n
+"
+        
+        android:textColor="#ff0000"
+        android:textSize="16dp" android:autoLink="web"/>
+    <TextView
+        android:id="@+id/ascii"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/aboutText"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:text="
+MMMMMMZ............................,,NMMM.O,............................MMMMMMMM\n
+MMMMMMZ.........................,MZ .7+?Z..MM...........................MMMMMMMM\n
+MMMMMMZ.................... ..,MMMI.. MM....MMM.........................MMMMMMMM\n
+MMMMMMZ.................NMMMMMMMMM...M=+N...MMMMMMMM,. .................MMMMMMMM\n
+MMMMMMZ................MMMMMMMMMMM....MM....MMMMMMMMMMM,................MMMMMMMM\n
+MMMMMMZ................MMMMMMMMMMM....MM....MMMMMMMMMMMM................MMMMMMMM\n
+MMMMMMZ...............7MMMMMMMMMMM....MM~..?MMMMMMMMMMMM................MMMMMMMM\n
+MMMMMMZ...............MMMMMMMMMMMM=..,MM8..MMMMMMMMMMMMM................MMMMMMMM\n
+MMMMMMZ...............MMMMMMMMMMMMM..=MMM.:MMMMMMMMMMMMM+...............MMMMMMMM\n
+MMMMMMZ...............MMMMMMMMMMMMMM.?MMM.MMMMMMMMMMMMMM?...............MMMMMMMM\n
+MMMMMMZ..............MMMMMMMMMMMMMMMM7MMNMMMMMMMMMMMMMMMN...............MMMMMMMM\n
+MMMMMMZ..............MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM...............MMMMMMMM\n
+MMMMMMZ..............MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM...............MMMMMMMM\n
+MMMMMMZ.............~MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM...............MMMMMMMM\n
+MMMMMMZ.............ZMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM...............MMMMMMMM\n
+MMMMMMZ.............MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM~..............MMMMMMMM\n
+MMMMMMZ.............MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN..............MMMMMMMM\n
+MMMMMMZ.............MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM..............MMMMMMMM\n
+MMMMMMZ..............MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO..............MMMMMMMM\n
+MMMMMMZ...............MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMD...............MMMMMMMM\n
+MMMMMMZ.................MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMI.................MMMMMMMM\n
+MMMMMMZ...................MMMMMMMMMMMMMMMMMMMMMMMMMM....................MMMMMMMM\n
+MMMMMMZ...................MMMMMMMMMMMMMMMMMMMMMMMMM.....................MMMMMMMM\n
+MMMMMMZ...................MMMMMMMMMMMMMMMMMMMMMMMMM.....................MMMMMMMM\n
+MMMMMMZ..................~MMMMMMMMMMMMMMMMMMMMMMMMMM................ ...MMMMMMMM\n
+MMMMMMZ..................MMMMMMMMMMMMMMMMMMMMMMMMMMM....................MMMMMMMM\n
+MMMMMMZ..................MMMMMMMMMMMMMMMMMMMMMMMMMMM....................MMMMMMMM\n
+MMMMMMZ..................MMMMMMMMMMMMMMMMMMMMMMMMMMM....................MMMMMMMM\n
+MMMMMMZ..................MMMMMMMMMMMMMMMMMMMMMMMMMMM....................MMMMMMMM\n
+MMMMMMZ..................?MMMMMMMMMMMMMMMMMMMMMMMMM.....................MMMMMMMM\n
+MMMMMMZ...................$MMMMMMMMMMMMMMMMMMMMMMM......................MMMMMMMM\n
+MMMMMMZ...................=MMMMMMMMMMMMMMMMMMMMMM?......................MMMMMMMM\n
+MMMMMMZ....................MMM  we are l3g10n  MM.......................MMMMMMMM\n
+MMMMMMZ....................MMMMMMMMMMMMMMMMMMMMMM.......................MMMMMMMM\n
+MMMMMMZ....................MMMMMMMMMMMMMMMMMMMMMM.......................MMMMMMMM\n
+"
+        
+        android:textColor="#ff0000"
+        android:textSize="5dp" android:autoLink="web" android:typeface="monospace"
+        />
+    <TextView 
+        android:layout_below="@+id/ascii"
+        android:textColor="#ff0000"
+        android:textSize="14dp"
+        android:text="Do Something Selfless Today For Someone You Love and For Someone You Don't"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"/>
+</RelativeLayout>
+</ScrollView>
+</RelativeLayout>
