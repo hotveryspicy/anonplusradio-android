@@ -11,6 +11,11 @@ public class IrcAgent
 	extends
 		PircBot
 {
+	public IrcAgent()
+	{
+		
+	};
+	
 	/*
 	 * =========================================
 	 * 		FIELD MEMBERS
@@ -307,5 +312,10 @@ public class IrcAgent
 			client.onInvite(targetNick, sourceNick, sourceLogin, sourceHostname, channel);
 		}
 
+	}
+
+	public void addClient(IIrcAgentClient client) {
+		mClients.add(client);
+		
 	}
 }

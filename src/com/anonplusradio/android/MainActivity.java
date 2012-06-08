@@ -26,6 +26,7 @@ import android.widget.ToggleButton;
 
 import com.anonplusradio.android.R;
 
+import com.anonplusradio.android.irc.IRCService;
 import com.anonplusradio.android.media.mediaplayer.IMediaPlayerServiceClient;
 import com.anonplusradio.android.media.mediaplayer.MediaPlayerService;
 import com.anonplusradio.android.media.mediaplayer.StatefulMediaPlayer;
@@ -348,6 +349,10 @@ public class MainActivity
     	
         Intent intent = new Intent(this, MediaPlayerService.class);
     	stopService(intent);
+    	
+    	intent = new Intent(this, IRCService.class);
+    	stopService(intent);
+    	
     	finish();
     	
     }

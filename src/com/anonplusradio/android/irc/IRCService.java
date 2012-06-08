@@ -11,9 +11,6 @@ import java.util.StringTokenizer;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.NickAlreadyInUseException;
 import org.jibble.pircbot.User;
-import org.schwering.irc.lib.IRCConnection;
-import org.schwering.irc.lib.IRCUser;
-import org.schwering.irc.lib.IRCUtil;
 
 import com.anonplusradio.android.CONSTANTS;
 
@@ -52,11 +49,19 @@ public class IRCService
 
 	public ArrayList<String> getNickList()
 	{
+		Log.d(TAG, "getNickList() called");
+		nickList = new ArrayList<String>();
+		for (User user: mIRCAgent.getUsers("#anonplusradio"))
+		{
+			nickList.add(user.getNick());
+		}
+		Log.d(TAG, "returning niclList. Count: " + nickList.size());
 		return nickList;
 	}
 
 	public String getChatHistory()
 	{
+		Log.d(TAG, "getChatHistory() called... length:" + channelHistory.length());
 		return channelHistory;
 	}
 
@@ -85,11 +90,14 @@ public class IRCService
 	 */
 	public void appendChannelHistory(String amendment)
 	{
-		channelHistory.concat(amendment);
+		Log.d(TAG, "appendChannelHistory() called. Amendment: " + amendment);
+		channelHistory = channelHistory.concat(amendment);
 		if (channelHistory.length() > 5000)
 		{
-			channelHistory = channelHistory.substring(0 + amendment.length(), channelHistory.length());
+			channelHistory = new String(channelHistory.substring(0 + amendment.length(), channelHistory.length()));
 		}
+		
+		Log.d(TAG, "channel history appended. Length: " + channelHistory.length());
 	}
 
 	/*
@@ -100,6 +108,8 @@ public class IRCService
 	public void onCreate()
 	{
 		Log.d(TAG, "onCreate() called");
+		initializeConnection("irc.anonplus.com", 6667, "test123");
+
 	}
 
 	@Override
@@ -129,11 +139,17 @@ public class IRCService
 			return IRCService.this;
 		}
 	}
-
+	
 	@Override
 	public IBinder onBind(Intent arg0)
 	{
 		return mBinder;
+	}
+	
+	
+	public void unRegister()
+	{
+		mClient = null;
 	}
 
 	/*
@@ -157,7 +173,9 @@ public class IRCService
 		int port,
 		String nick)
 	{
+		Log.d(TAG, "initializeConnection() called. Hostname: " + hostname + "; port: " + port + "; nick: " + nick);
 		mIRCAgent = new IrcAgent();
+		mIRCAgent.addClient(this);
 		mIRCAgent.changeNick(nick);
 		try
 		{
@@ -172,12 +190,12 @@ public class IRCService
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
+			Log.e(TAG, "IOException: " + e.getMessage());
 			e.printStackTrace();
 		}
 		catch (IrcException e)
 		{
-			// TODO Auto-generated catch block
+			Log.e(TAG, "IrcException: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -197,7 +215,11 @@ public class IRCService
 	@Override
 	public void onConnect()
 	{
+		
 		Log.d(TAG, "onConnect() called");
+		//TODO set user-set nick
+		
+		mIRCAgent.changeNick("testandroiduser");
 		// join default channel
 		mIRCAgent.joinChannel(CONSTANTS.CHAT_CHANNEL);
 
@@ -214,10 +236,14 @@ public class IRCService
 	@Override
 	public void onUserList(String channel, User[] users)
 	{
+		Log.d(TAG, "onUserList() called");
 		nickList = new ArrayList<String>();
 
 		for (User user : users)
+		{
 			nickList.add(user.getNick());
+		}
+		mClient.onUserList(channel, nickList);
 	}
 
 	@Override
@@ -256,7 +282,9 @@ public class IRCService
 		String target,
 		String action)
 	{
-		
+		Log.d(TAG, "onAction() called");
+		appendChannelHistory(sender + " " + action + "\n");
+		mClient.onAction(sender, login, hostname, target, action);
 	}
 
 	@Override
@@ -281,6 +309,7 @@ public class IRCService
 		Log.d(TAG, "onJoin() called");
 		nickList.add(sender);
 		appendChannelHistory(sender + " has joined " + channel);
+		mClient.onJoin(channel, sender, login, hostname);
 	}
 
 	@Override
@@ -293,6 +322,7 @@ public class IRCService
 		Log.d(TAG, "onPart() called");
 		nickList.remove(sender);
 		appendChannelHistory(sender + " has left " + channel);
+		mClient.onPart(channel, sender, login, hostname);
 	}
 
 	@Override
@@ -303,8 +333,10 @@ public class IRCService
 		String newNick)
 	{
 		Log.d(TAG, "onNickChange() called");
+		nickList.remove(oldNick);
+		nickList.add(newNick);
 		appendChannelHistory(oldNick + " is now known as " + newNick);
-
+		mClient.onNickChange(oldNick, login, hostname, newNick);
 	}
 
 	@Override
@@ -316,8 +348,10 @@ public class IRCService
 		String recipientNick,
 		String reason)
 	{
-		// TODO Auto-generated method stub
-
+		Log.d(TAG, "onKick() called");
+		nickList.remove(recipientNick);
+		appendChannelHistory(recipientNick + " got his fgt ass kicked by " + kickerNick + ". - " + reason);
+		mClient.onKick(channel, kickerNick, kickerLogin, kickerHostname, recipientNick, reason);
 	}
 
 	@Override
@@ -328,7 +362,9 @@ public class IRCService
 		String reason)
 	{
 		Log.d(TAG, "onQuit() called");
+		nickList.remove(sourceNick);
 		appendChannelHistory(sourceNick + " has quit IRC: " + reason);
+		mClient.onQuit(sourceNick, sourceLogin, sourceHostname, reason);
 
 	}
 
@@ -397,4 +433,6 @@ public class IRCService
 		// TODO Auto-generated method stub
 
 	}
+
+	
 }

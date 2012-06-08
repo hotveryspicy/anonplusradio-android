@@ -4,16 +4,14 @@
 package com.anonplusradio.android;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
-
-import org.schwering.irc.lib.IRCUser;
-import org.schwering.irc.lib.IRCUtil;
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
@@ -33,11 +31,18 @@ import com.anonplusradio.android.irc.IRCService.IRCServiceBinder;
  *
  */
 public class ChatroomActivity extends Activity implements IIRCServiceClient  {
+	/*
+	 * ************ FIELD MEMBERS *********
+	 */
 	private String TAG							= "ChatroomActivity";
 	private TextView mChatTextView;				//= (TextView) findViewById(R.id.chatTextView);
 	private TextView mNickListTextView;
 	private boolean mBound						= false;
 	private IRCService mService;
+	
+	/*
+	 * ************ Activity Implementation *********
+	 */
 	
 	@Override 
 	protected void onCreate(android.os.Bundle savedInstanceState)
@@ -56,21 +61,29 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 		//setup event listeners, etc for buttons
 		initializeButtons();
 		
+		
+	}
+	
+	protected void onResume()
+	{
+		super.onResume();
 		//bind to IRCService
 		bindToService();
 	}
 	
-	@Override
-	public void onResume()
+	protected void onStop()
 	{
-		super.onResume();
-		
-		
-
+		super.onDestroy();
+    	if (mBound)
+    	{
+    		mService.unRegister();
+    		unbindService(mConnection);
+    		mBound = false;
+    	}
 	}
 	
-
-	private void initializeButtons() {
+	private void initializeButtons()
+	{
 		mChatTextView.setMovementMethod(new ScrollingMovementMethod());
 
 		final 	Button chatSendButton = (Button) findViewById(R.id.chatSendButton);
@@ -86,7 +99,7 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 
 		});
 	}
-
+	
 	private void updateChannelView(String outputText)
 	{
 		final String output = outputText;
@@ -104,93 +117,56 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 		});
 	}
 	
-	private void updateNickListView(ArrayList<String> nickList)
+	private void updateNickListView(final ArrayList<String> nickList)
 	{
+		Log.d(TAG, "updateNickListView() called. Count: " + nickList.size());
 		if (nickList != null)
 		{
-			for (String nick : nickList)
-			{
-				mNickListTextView.append(nick + "\n");
-			}
-			
-		}
-	}
+			runOnUiThread(new Runnable(){
 
- 
-
-	
-	@Override
-	public void onPrivmsg(String chan, IRCUser user, String msg)
-	{
-		StringBuilder outputLine = new StringBuilder();
-		String nick = user.getNick();
-
-		outputLine.append("<" + nick + "> " + msg + "\n");
-		updateChannelView(outputLine.toString());
-	}
-
-
-	@Override
-	public void onQuit(IRCUser arg0, String arg1) {
-		// TODO Auto-generated method stub
-
-	}
-
-
-	@Override
-	public void onRegistered()
-	{
-		Log.v("TAG", "registered");
-	}
-
-	@Override
-	public void onMessage(int num, String value, String msg)
-	{
-		StringBuilder outputLine = new StringBuilder();
-
-		if ( num == IRCUtil.RPL_NAMREPLY) // nicklist 
-		{
-
-			StringTokenizer stValue = new StringTokenizer(value);
-			stValue.nextToken(); // skip name
-			stValue.nextToken(); // skip (it is a '@', '*' or '=')
-			StringTokenizer stNicks = new StringTokenizer(msg);
-			//String[] nicks = new String[stNicks.countTokens()];
-
-			final TextView chatNickListTextView = (TextView) findViewById(R.id.chatNickListTextView);
-			int i = 0;
-			while(stNicks.hasMoreTokens())
-			{
-				final String nextNick = stNicks.nextToken();
-				i++;
-				Log.v(TAG, nextNick);
-				runOnUiThread(new Runnable()
+				@Override
+				public void run()
 				{
-					@Override
-					public void run() 
+					for (String nick : nickList)
 					{
-						chatNickListTextView.append(nextNick + "\n");
-					}
-
-				});
-
-			}
-
-			//outputLine.append(msg);
-			Log.v(TAG, "nick list size: " + i);
-
-
+						mNickListTextView.append(nick + "\n");
+					}					
+				}
+				
+			});
 		}
-		else if (num == IRCUtil.RPL_TOPIC) // on-join topic
-		{ 
-			outputLine.append("*** Topic *** \n" + msg + "\n******\n");
-			StringTokenizer stValue = new StringTokenizer(value);
-			stValue.nextToken(); // jump over the first (it is our name)
-		}
-
-		updateChannelView(outputLine.toString());
 	}
+	
+	private void getNickFromUser()
+	{
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
+		alert.setTitle("Title");
+		alert.setMessage("Message");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		alert.setView(input);
+
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		  String value = input.getText().toString();
+		  // Do something with value!
+		  }
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		  public void onClick(DialogInterface dialog, int whichButton) {
+		    // Canceled.
+		  }
+		});
+
+		alert.show();
+	}
+	
+	/*
+	 * ************ SERVICE CLIENT IMPLEMENTATION ***********
+	 */
 
 	/** 
 	 * Defines callbacks for service binding, passed to bindService()
@@ -231,7 +207,7 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 	 */
 	public void bindToService()
 	{
-        Intent intent = new Intent(this, IRCService.class);
+        Intent intent = new Intent(this.getApplicationContext(), IRCService.class);
 		
         if (IRCServiceRunning())
         {
@@ -244,9 +220,7 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 			//start service and bind to it
 			startService(intent);
 	        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-
 		}
-		
 	}
 
 	/**
@@ -262,8 +236,90 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
                 return true;
             }
         }
-        
+    	
         return false;
+	}
+ 
+	/*
+	 * ************ IRC EVENT CALLBACKS *********
+	 */
+
+	@Override
+	public void onPrivateMessage(String sender, String login, String hostname,
+			String message)
+	{
+		StringBuilder outputLine = new StringBuilder();
+		outputLine.append("PM: <" + sender + "> " + message + "\n");
+		updateChannelView(outputLine.toString());
+	}
+
+	@Override
+	public void onConnected()
+	{
+		updateChannelView("Connection established! \n");
+	}
+
+	@Override
+	public void onMessage(String channel, String sender, String login,
+			String hostname, String message)
+	{
+		StringBuilder outputLine = new StringBuilder();;
+		outputLine.append("<" + sender + "> " + message + "\n");
+		updateChannelView(outputLine.toString());
+		
+	}
+
+	@Override
+	public void onAction(String sender, String login, String hostname,
+			String target, String action) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onJoin(String channel, String sender, String login,
+			String hostname)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPart(String channel, String sender, String login,
+			String hostname)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onNickChange(String oldNick, String login, String hostname,
+			String newNick) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onKick(String channel, String kickerNick, String kickerLogin,
+			String kickerHostname, String recipientNick, String reason)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onQuit(String sourceNick, String sourceLogin,
+			String sourceHostname, String reason)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUserList(String channel, ArrayList<String> nickList)
+	{
+		updateNickListView(nickList);
+		
 	}
 
 
