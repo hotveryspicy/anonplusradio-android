@@ -4,6 +4,7 @@
 package com.anonplusradio.android;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -35,7 +36,8 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 	 * ************ FIELD MEMBERS *********
 	 */
 	private String TAG							= "ChatroomActivity";
-	private TextView mChatTextView;				//= (TextView) findViewById(R.id.chatTextView);
+	private String mUserNick					= "default_FAGG0T";
+	private TextView mChatTextView;
 	private TextView mNickListTextView;
 	private boolean mBound						= false;
 	private IRCService mService;
@@ -90,10 +92,24 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 		chatSendButton.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public void onClick(View view) {
+			public void onClick(View view)
+			{
+				
 				EditText chatInput = (EditText) findViewById(R.id.chatInput);
-				mService.doPrivmsg(CONSTANTS.CHAT_CHANNEL, chatInput.getText().toString());
-				updateChannelView(chatInput.getText().toString() + "\n");
+				String input = chatInput.getText().toString();
+				String[] tokens = input.split(" ");
+			
+				if (tokens[0].equalsIgnoreCase("/nick"))
+				{
+					mUserNick = tokens[1];
+					mService.setNick(mUserNick);
+				}
+				else
+				{
+					mService.doPrivmsg(CONSTANTS.CHAT_CHANNEL, input);
+					updateChannelView("<" + mUserNick + ">" + chatInput.getText().toString() + "\n");
+				}
+				
 				chatInput.setText("");
 			}
 
@@ -127,6 +143,7 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 				@Override
 				public void run()
 				{
+					mNickListTextView.setText("");
 					for (String nick : nickList)
 					{
 						mNickListTextView.append(nick + "\n");
@@ -141,8 +158,8 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 	{
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-		alert.setTitle("Title");
-		alert.setMessage("Message");
+		alert.setTitle("Nick");
+		alert.setMessage("Set a nickname bitch");
 
 		// Set an EditText view to get user input 
 		final EditText input = new EditText(this);
@@ -150,8 +167,8 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
-		  String value = input.getText().toString();
-		  // Do something with value!
+			mUserNick =  input.getText().toString();
+		  	mService.setNick(mUserNick);
 		  }
 		});
 
@@ -271,31 +288,37 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 
 	@Override
 	public void onAction(String sender, String login, String hostname,
-			String target, String action) {
-		// TODO Auto-generated method stub
-		
+			String target, String action)
+	{
+		Log.d(TAG, "onAction() called");
+		updateChannelView(sender + " " + action +"\n");
 	}
 
 	@Override
 	public void onJoin(String channel, String sender, String login,
 			String hostname)
 	{
-		// TODO Auto-generated method stub
-		
+		Log.d(TAG, "onJoin() called");
+		updateNickListView(mService.getNickList());
+		updateChannelView(sender + " has joined " + channel +"\n");		
 	}
 
 	@Override
 	public void onPart(String channel, String sender, String login,
 			String hostname)
 	{
-		// TODO Auto-generated method stub
-		
+		Log.d(TAG, "onPart() called");
+		updateNickListView(mService.getNickList());
+		updateChannelView(sender + " has left " + channel +"\n");		
 	}
 
 	@Override
 	public void onNickChange(String oldNick, String login, String hostname,
-			String newNick) {
-		// TODO Auto-generated method stub
+			String newNick)
+	{
+		Log.d(TAG, "onNickChange called");
+		updateNickListView(mService.getNickList());
+		updateChannelView(oldNick + " is now known as " + newNick +"\n");
 		
 	}
 
@@ -303,23 +326,26 @@ public class ChatroomActivity extends Activity implements IIRCServiceClient  {
 	public void onKick(String channel, String kickerNick, String kickerLogin,
 			String kickerHostname, String recipientNick, String reason)
 	{
-		// TODO Auto-generated method stub
-		
+		Log.d(TAG, "onKick() called");
+		updateNickListView(mService.getNickList());
+		updateChannelView(kickerNick + " was kicked by " + kickerNick + ": " + reason +"\n");
 	}
 
 	@Override
 	public void onQuit(String sourceNick, String sourceLogin,
 			String sourceHostname, String reason)
 	{
-		// TODO Auto-generated method stub
+		Log.d(TAG, "onQuit() called");
+		updateNickListView(mService.getNickList());
+		updateChannelView(sourceNick + " has quit IRC: " + reason +"\n");
 		
 	}
 
 	@Override
 	public void onUserList(String channel, ArrayList<String> nickList)
 	{
+		Log.d(TAG, "onUserList() called");
 		updateNickListView(nickList);
-		
 	}
 
 

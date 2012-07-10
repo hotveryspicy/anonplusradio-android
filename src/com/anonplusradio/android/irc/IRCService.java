@@ -36,10 +36,12 @@ public class IRCService
 
 	private String TAG = "IRCService";
 
-	private ArrayList<String> nickList = new ArrayList<String>();
-	private String channelHistory = "";
+	private ArrayList<String> nickList		= new ArrayList<String>();
+	private String channelHistory			= "AnonPlusRadio IRC. Do Not assume this is a secure transmission. \n" +
+											"Type /nick <nickname> to set a nick.";
+	private String mUserNick				= "";
 
-	private final Binder mBinder = new IRCServiceBinder();
+	private final Binder mBinder			= new IRCServiceBinder();
 	private IrcAgent mIRCAgent;
 	private IIRCServiceClient mClient;
 
@@ -108,7 +110,7 @@ public class IRCService
 	public void onCreate()
 	{
 		Log.d(TAG, "onCreate() called");
-		initializeConnection("irc.anonplus.com", 6667, "test123");
+		initializeConnection("irc.anonplus.com", 6667, mUserNick);
 
 	}
 
@@ -174,9 +176,10 @@ public class IRCService
 		String nick)
 	{
 		Log.d(TAG, "initializeConnection() called. Hostname: " + hostname + "; port: " + port + "; nick: " + nick);
+		mUserNick = nick;
 		mIRCAgent = new IrcAgent();
 		mIRCAgent.addClient(this);
-		mIRCAgent.changeNick(nick);
+		mIRCAgent.changeNick(mUserNick);
 		try
 		{
 			mIRCAgent.connect(hostname, port);
@@ -184,7 +187,7 @@ public class IRCService
 		catch (NickAlreadyInUseException e)
 		{
 			Log.e(TAG, "Nick already in use! will retry with random number appended.");
-			nick = nick
+			mUserNick = mUserNick
 				+ Double.toString(Math.floor(Math.random() * 9999));
 			initializeConnection(hostname, port, nick);
 		}
@@ -207,6 +210,12 @@ public class IRCService
 	{
 		mIRCAgent.sendMessage(user, message);
 	}
+	
+	public void setNick(String nick)
+	{
+		this.mUserNick = nick;
+		mIRCAgent.changeNick(mUserNick);
+	}
 
 	/*
 	 * ************ IRC EVENT CALLBACKS *********
@@ -219,7 +228,7 @@ public class IRCService
 		Log.d(TAG, "onConnect() called");
 		//TODO set user-set nick
 		
-		mIRCAgent.changeNick("testandroiduser");
+		mIRCAgent.changeNick(mUserNick);
 		// join default channel
 		mIRCAgent.joinChannel(CONSTANTS.CHAT_CHANNEL);
 
